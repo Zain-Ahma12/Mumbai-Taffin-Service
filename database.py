@@ -8,7 +8,8 @@ database_url = os.getenv("DATABASE_URL")
 
 engine = create_engine(database_url, echo=True)
 
-def create_tables():
+def create_tables() -> None:
+    """Create all tables that do not exist yet."""
     SQLModel.metadata.create_all(engine)
 
 
