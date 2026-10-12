@@ -30,9 +30,10 @@ class Order(SQLModel, table=True):
 class OrderCreate(SQLModel):
     customer_first_name: str
     customer_last_name: str
+    delivery_address: str
     items: str
 
-class OrderUpdateStatus(SQLModel):
+class OrderUpdate(SQLModel):
     status: Optional[OrderStatus] = None
     delivery_address: Optional[str] = None
 
