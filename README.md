@@ -130,6 +130,11 @@ Run the project and open **http://127.0.0.1:8000/docs** to try every endpoint fr
 <div align="center"><img src="assets/swagger-ui.png" alt="Custom Swagger UI" width="100%"/></div>
 -->
 
+
+### Demo Video
+
+[▶ Watch the Swagger UI Demo](https://zain-ahma12.github.io/Rangmanch-Review-api/)
+
 ---
 
 ## 🤝 Contributing & License
