@@ -19,10 +19,22 @@ class Order(SQLModel, table=True):
     delivery_address: str
     items: str
     status: OrderStatus = Field(default=OrderStatus.PREPARING)
+    cancellation_reason: Optional[str] = None  # filled only when the order is cancelled
     created_at: datetime = Field(
         default_factory = lambda: datetime.now(timezone.utc)
     )
     updated_at: datetime = Field(
+        default_factory = lambda: datetime.now(timezone.utc)
+    )
+
+# add a table for status logs
+class StatusLog(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    order_id: int = Field(foreign_key="order.id", index=True)
+    old_status: Optional[OrderStatus] = None # None when the order is first created
+    new_status: OrderStatus
+    reason: Optional[str] = None # only filled when the order is cancelled
+    changed_at: datetime = Field(
         default_factory = lambda: datetime.now(timezone.utc)
     )
     
@@ -37,8 +49,5 @@ class OrderUpdate(SQLModel):
     status: Optional[OrderStatus] = None
     delivery_address: Optional[str] = None
 
-class StatusLog(SQLModel):
-    order_id: int
-    old_status: OrderStatus
-    new_status: OrderStatus
-    changed_at: datetime
+class OrderCancel(SQLModel):
+    reason: str = Field(min_length=5, max_length=255)

@@ -14,28 +14,36 @@ router = APIRouter(prefix="/stats", tags=["stats"])
 def daily_summary(
     summary_date: date | None = Query(default=None, description="date for summary (YYYY-MM-DD)"),
     session: Session = Depends(get_session)
-):
-    if summary_date is None:
-        summary_date = date.today()
-        start_of_day = datetime.combine(summary_date, time.min, tzinfo=timezone.utc)
-        next_day = start_of_day + timedelta(days=1)
-
-    summary = {}
-    total = 0
+) -> dict[str, object]:
+    day = summary_date or datetime.now(timezone.utc).date()
+    start_of_day = datetime.combine(day, time.min, tzinfo=timezone.utc)
+    next_day = start_of_day + timedelta(days=1)
     
-    for status in OrderStatus:
-        count = session.exec(
-            select(func.count(Order.id))
-            .where(
-                Order.created_at >= start_of_day,
-                Order.created_at < next_day,
-                Order.status == status
-            )
-        ).one()
-        summary[status.value] = count # Store the count for each status in the summary dictionary
-        total += count # Add the count to the total
+    # querry that counts orders per status.
+    rows = session.exec(
+        select(Order.status, func.count(Order.id))
+        .where(
+            Order.created_at >= start_of_day,
+            Order.created_at < next_day
+        )
+        .group_by(Order.status)
+    ).all()
+
+
+    # Start every status at 0 so the response always has the same shape.
+    by_status = {s.value: 0 for s in OrderStatus}
+    for order_status, count in rows:
+        by_status[order_status.value] = count
+    
+    total = sum(by_status.values())
+    delivered = by_status[OrderStatus.DELIVERED.value]
+    cancelled = by_status[OrderStatus.CANCLED.value]
+
     return {
-        "summary_date": summary_date.isoformat(),
-        "summary": summary,
-        "total_orders": total
+        "summary_date": day.isoformat(),
+        "total_orders": total,
+        "by_status": by_status,
+        "active_orders": total - delivered - cancelled, # still preparing or on the way
+        "delivery_rate_percent": round(delivered / total * 100, 2) if total  else 0,
+        "cancellation_rate_percent": round(cancelled / total * 100, 2) if total else 0,
     }
