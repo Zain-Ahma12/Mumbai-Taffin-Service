@@ -43,11 +43,15 @@ This project uses [**uv**](https://docs.astral.sh/uv/) and all dependencies live
 
 **1. Install uv** (see the [official guide](https://docs.astral.sh/uv/getting-started/installation/)).
 
+```bash
+pip install uv # most easy methond (install globally)
+```
+
 **2. Clone the repository**
 
 ```bash
-git clone https://github.com/<your-username>/mumbai-taffin-service.git
-cd mumbai-taffin-service
+git clone https://github.com/Zain-Ahma12/Mumbai-Taffin-Service.git
+cd Mumbai-Taffin-Service
 ```
 
 **3. Add a `.env` file** with your database URL (any SQLAlchemy-compatible URL works)
@@ -59,7 +63,7 @@ DATABASE_URL=sqlite:///./taffin.db
 **4. Start the server** (uv creates the virtual environment and installs everything for you)
 
 ```bash
-uv run main.py
+uv run main.py  # just run this single command after installing uv
 ```
 
 **5. Open the app**
